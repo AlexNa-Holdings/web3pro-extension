@@ -17,7 +17,7 @@ class Connection extends EventEmitter {
   }
 }
 
-let mmAppear = window.localStorage.getItem('__frameAppearAsMM__')
+let mmAppear = window.localStorage.getItem('__web3proAppearAsMM__')
 
 try {
   mmAppear = JSON.parse(mmAppear)

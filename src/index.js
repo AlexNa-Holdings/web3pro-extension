@@ -13,9 +13,9 @@ const getOrigin = url => {
 
 const pop = show => {
   if (show) {
-    chrome.browserAction.setPopup({ popup: 'pop.html' })
+    chrome.action.setPopup({ popup: 'pop.html' })
   } else {
-    chrome.browserAction.setPopup({ popup: 'settings.html' })
+    chrome.action.setPopup({ popup: 'settings.html' })
   }
 }
 
@@ -42,22 +42,14 @@ provider.connection.on('payload', payload => {
 })
 
 chrome.runtime.onMessage.addListener((payload, sender, sendResponse) => {
-  if (payload.method === 'frame_summon') return provider.connection.send(payload)
   const id = provider.nextId++
   pending[id] = { tabId: sender.tab.id, payloadId: payload.id, method: payload.method }
-  const load = Object.assign({}, payload, { id, __frameOrigin: getOrigin(sender.url) })
+  const load = Object.assign({}, payload, { 
+    id, 
+    __web3proOrigin: getOrigin(sender.url)
+  })
   provider.connection.send(load)
 })
-
-// chrome.browserAction.onClicked.addListener(tab => {
-//   if (provider.connected) {
-//     const load = { jsonrpc: '2.0', id: 1, method: 'frame_summon', params: [] }
-//     provider.connection.send(load)
-//   } else {
-//     if (provider && provider.close) provider.close()
-//     provider = ethProvider('ws://127.0.0.1:1248?identity=frame-extension')
-//   }
-// })
 
 const unsubscribeTab = tabId => {
   Object.keys(pending).forEach(id => { if (pending[id].tabId === tabId) delete pending[id] })
