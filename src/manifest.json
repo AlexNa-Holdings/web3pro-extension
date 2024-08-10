@@ -11,9 +11,9 @@
   "action": {
     "default_title": "Web3Pro",
     "default_icon": {
-      "16": "icons/icon16.png",
-      "48": "icons/icon48.png",
-      "96": "icons/icon96.png"
+      "16": "icon16.png",
+      "48": "icon48.png",
+      "96": "icon96.png"
     }
   },
   "content_security_policy": {
@@ -44,8 +44,8 @@
     "http://*/*"
   ],
   "icons": {
-    "16": "icons/icon16.png",
-    "48": "icons/icon48.png",
-    "96": "icons/icon96.png"
+    "16": "icon16.png",
+    "48": "icon48.png",
+    "96": "icon96.png"
   }
 }

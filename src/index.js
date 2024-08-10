@@ -1,8 +1,3 @@
-const ethProvider = require("eth-provider");
-const provider = ethProvider(
-  "ws://127.0.0.1:9323/ws?identity=web3pro-extension"
-);
-
 const updatePopup = (isConnected) => {
   const popupFile = isConnected ? "settings.html" : "pop.html";
   chrome.action.setPopup({ popup: popupFile });
@@ -87,6 +82,7 @@ connectWebSocket();
 
 const subs = {};
 const pending = {};
+var nextId = 1;
 
 const getOrigin = (url) => {
   const path = url.split("/");
@@ -101,7 +97,7 @@ if (webSocket.readyState === WebSocket.OPEN) {
 }
 
 chrome.runtime.onMessage.addListener((payload, sender, sendResponse) => {
-  const id = provider.nextId++;
+  const id = nextId++;
   pending[id] = {
     tabId: sender.tab.id,
     payloadId: payload.id,
@@ -111,7 +107,6 @@ chrome.runtime.onMessage.addListener((payload, sender, sendResponse) => {
     id,
     __web3proOrigin: getOrigin(sender.url),
   });
-  // provider.connection.send(load)
   webSocket.send(JSON.stringify(load));
 });
 
@@ -123,12 +118,13 @@ const unsubscribeTab = (tabId) => {
   });
   Object.keys(subs).forEach((sub) => {
     if (subs[sub].tabId === tabId) {
-      provider.send({
+      const message = {
         jsonrpc: "2.0",
         id: 1,
         method: "eth_unsubscribe",
         params: [sub],
-      });
+      };
+      webSocket.send(JSON.stringify(message));
       delete subs[sub];
     }
   });
