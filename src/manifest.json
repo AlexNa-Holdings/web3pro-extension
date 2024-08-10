@@ -1,9 +1,9 @@
 {
   "name": "Web3Pro",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "manifest_version": 3,
   "description": "Web3Pro",
-  "homepage_url": "https://github.com/floating/frame",
+  "homepage_url": "https://github.com/AlexNa-Holdings/web3pro-extension",
   "background": {
     "service_worker": "index.js",
     "type": "module"
@@ -16,20 +16,33 @@
       "96": "icons/icon96.png"
     }
   },
-  "content_scripts" : [{
-    "matches": ["file://*/*", "http://*/*", "https://*/*"],
-    "js": ["inject.js"],
-    "run_at": "document_start",
-    "all_frames": true
-  }],
-"permissions": [
-  "activeTab",
-  "tabs"
-],
-"host_permissions": [
-  "https://*/*",
-  "http://*/*"
-],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "file://*/*",
+        "http://*/*",
+        "https://*/*"
+      ],
+      "js": [
+        "frame.js"
+      ],
+      "run_at": "document_start",
+      "all_frames": true
+    }
+  ],
+  "permissions": [
+    "activeTab",
+    "scripting",
+    "storage",
+    "tabs"
+  ],
+  "host_permissions": [
+    "https://*/*",
+    "http://*/*"
+  ],
   "icons": {
     "16": "icons/icon16.png",
     "48": "icons/icon48.png",

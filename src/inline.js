@@ -3,7 +3,6 @@ const path = require('path')
 const ncp = require('ncp')
 
 const inject = `
-  var web3pro = unescape('${escape(fs.readFileSync(path.join(__dirname, '../dist/web3pro.js')).toString())}')
   try {
     chrome.runtime.onMessage.addListener((payload, sender, sendResponse) => window.postMessage({type: 'eth:payload', payload: payload}, window.location.origin))
     window.addEventListener('message', event => {
@@ -11,8 +10,8 @@ const inject = `
     })
     let script = document.createElement('script')
     script.setAttribute('type', 'text/javascript')
-    script.innerText = web3pro
-    script.onload = function () { this.remove() }
+    //script.src = chrome.runtime.getURL('frame.js')
+    //script.onload = function () { this.remove() }
     document.head ? document.head.prepend(script) : document.documentElement.prepend(script)
   } catch (e) {
     console.log(e)

@@ -4,7 +4,7 @@ const TerserPlugin = require('terser-webpack-plugin')
 module.exports = [
   {
     mode: 'production',
-    entry: './src/web3pro.js',
+    entry: './src/frame.js',
     optimization: {
       minimizer: [
         new TerserPlugin({
@@ -14,7 +14,7 @@ module.exports = [
     },
     output: {
       path: path.resolve(__dirname, 'dist'),
-      filename: 'web3pro.js'
+      filename: 'frame.js'
     },
     performance: {
       hints: false

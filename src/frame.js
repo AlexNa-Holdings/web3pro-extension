@@ -1,6 +1,11 @@
 const EventEmitter = require('events')
 const EthereumProvider = require('ethereum-provider')
 
+chrome.runtime.onMessage.addListener((payload, sender, sendResponse) => window.postMessage({type: 'eth:payload', payload: payload}, window.location.origin))
+window.addEventListener('message', event => {
+  if (event.source === window && event.data && event.data.type === 'eth:send') chrome.runtime.sendMessage(event.data.payload)
+})
+
 class Connection extends EventEmitter {
   constructor () {
     super()

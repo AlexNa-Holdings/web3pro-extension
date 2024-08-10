@@ -3,26 +3,23 @@
   "version": "0.0.1",
   "repository": {
     "type": "git",
-    "url": "git://github.com/AlexNa-Holdings/web3pro-extension.git"
+    "url": "git://github.com/AlexNa-Holdings/web3pro-extension"
   },
   "description": "Web3Pro Companion Extension",
-  "main": "src",
-  "scripts": {
-    "test": "standard",
-    "build": "rimraf ./dist && webpack --config webpack.config.js && node ./src/inline.js && cp ./src/pop.html ./dist/pop.html"
-  },
-  "author": "Alex Na",
-  "license": "GPL-3.0",
+"scripts": {
+  "build": "rimraf ./dist && webpack --config webpack.config.js && node ./src/inline.js && cp ./src/pop.html ./dist/pop.html"
+},
   "devDependencies": {
-    "ncp": "2.0.0",
+    "browserify": "^17.0.0",
+    "ncp": "^2.0.0",
     "rimraf": "3.0.2",
     "standard": "16.0.3",
     "terser-webpack-plugin": "5.2.3",
-    "webpack": "^5.93.0",
+    "webpack": "5.52.0",
     "webpack-cli": "4.8.0"
   },
   "dependencies": {
-    "eth-provider": "^0.9.1",
-    "ethereum-provider": "0.4.4"
+    "events": "^3.3.0",
+    "ethereum-provider": "^1.0.0"
   }
 }
