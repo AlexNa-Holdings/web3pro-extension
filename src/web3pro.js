@@ -22,35 +22,41 @@ class Connection extends EventEmitter {
   }
 }
 
-let mmAppear = window.localStorage.getItem('__web3proAppearAsMM__')
-
-try {
-  mmAppear = JSON.parse(mmAppear)
-} catch (e) {
-  mmAppear = false
-}
-
-if (mmAppear) {
-  class MetaMaskProvider extends EthereumProvider { }
-
+chrome.storage.sync.get('__web3proAppearAsMM__', function(result) {
+  let mmAppear = result['__web3proAppearAsMM__'];
   try {
-    window.ethereum = new MetaMaskProvider(new Connection())
-    window.ethereum.isMetaMask = true
-    window.ethereum._metamask = {
-      isUnlocked: () => true
+    mmAppear = JSON.parse(mmAppear)
+  } catch (e) {
+    mmAppear = false
+  }
+  
+  if (mmAppear) {
+
+    console.log('appear as MM')
+  
+    class MetaMaskProvider extends EthereumProvider { }
+  
+    try {
+      window.ethereum = new MetaMaskProvider(new Connection())
+      window.ethereum.isMetaMask = true
+      window.ethereum._metamask = {
+        isUnlocked: () => true
+      }
+      window.ethereum.setMaxListeners(0)
+    } catch (e) {
+      console.error('Web3Pro Error:', e)
     }
-    window.ethereum.setMaxListeners(0)
-  } catch (e) {
-    console.error('Frame Error:', e)
+  } else {
+    console.log('appear as Web3Pro')
+    class Web3ProProvider extends EthereumProvider { }
+  
+    try {
+      window.ethereum = new Web3ProProvider(new Connection())
+      window.ethereum.isWeb3Pro = true
+      window.ethereum.setMaxListeners(0)
+    } catch (e) {
+      console.error('Web3Pro Error:', e)
+    }
   }
-} else {
-  class FrameProvider extends EthereumProvider { }
-
-  try {
-    window.ethereum = new FrameProvider(new Connection())
-    window.ethereum.isFrame = true
-    window.ethereum.setMaxListeners(0)
-  } catch (e) {
-    console.error('Frame Error:', e)
-  }
-}
+  
+});

@@ -14,7 +14,13 @@ function mmAppearToggle () {
       chrome.scripting.executeScript(
         {
           target: { tabId: tabs[0].id },
-          func: () => localStorage['__web3proAppearAsMM__']
+          func: () =>  {
+            return new Promise((resolve) => {
+              chrome.storage.sync.get(['__web3proAppearAsMM__'], function(result) {
+                resolve(result.__web3proAppearAsMM__);
+              });
+            });
+          }
         },
         (results) => {
         let mmAppear = false
@@ -27,8 +33,12 @@ function mmAppearToggle () {
           chrome.scripting.executeScript({
             target: { tabId: tabs[0].id },
             func: (mmAppear) => {
-              localStorage.setItem('__web3proAppearAsMM__', JSON.stringify(!mmAppear));
-              window.location.reload();
+              // Use chrome.storage.sync.set to update the value in storage
+              chrome.storage.sync.set({'__web3proAppearAsMM__': !mmAppear}, function() {
+                console.log('Value is set to ' + !mmAppear);
+                // Once the value is set, reload the page
+                window.location.reload();
+              });
             },
             args: [mmAppear] // Pass mmAppear as an argument
           });
@@ -59,7 +69,13 @@ document.addEventListener('DOMContentLoaded', function () {
     chrome.scripting.executeScript(
       {
         target: { tabId: tabs[0].id },
-        func: () => localStorage['__web3proAppearAsMM__']
+        func: () =>  {
+          return new Promise((resolve) => {
+            chrome.storage.sync.get(['__web3proAppearAsMM__'], function(result) {
+              resolve(result.__web3proAppearAsMM__);
+            });
+          });
+        }
       },
       (results) => {
       let mmAppear = false
