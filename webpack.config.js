@@ -5,7 +5,7 @@ const CopyWebpackPlugin = require("copy-webpack-plugin");
 module.exports = [
   {
     mode: "production",
-    entry: "./src/frame.js",
+    entry: "./src/web3pro.js",
     optimization: {
       minimizer: [
         new TerserPlugin({
@@ -15,7 +15,7 @@ module.exports = [
     },
     output: {
       path: path.resolve(__dirname, "dist"),
-      filename: "frame.js",
+      filename: "web3pro.js",
     },
     performance: {
       hints: false,

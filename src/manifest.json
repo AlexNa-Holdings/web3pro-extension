@@ -27,7 +27,7 @@
         "https://*/*"
       ],
       "js": [
-        "frame.js"
+        "web3pro.js"
       ],
       "run_at": "document_start",
       "all_frames": true
