@@ -7,7 +7,7 @@
   },
   "description": "Web3Pro Companion Extension",
   "scripts": {
-    "build": "rimraf ./dist && webpack --config webpack.config.js "
+    "build": "rimraf ./dist && webpack --config webpack.config.js && ./copy.sh"
   },
   "devDependencies": {
     "browserify": "^17.0.0",

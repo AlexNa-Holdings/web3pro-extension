@@ -90,7 +90,7 @@ const getOrigin = (url) => {
 };
 
 // Initially set the popup based on the WebSocket's readyState
-if (webSocket.readyState === WebSocket.OPEN) {
+if (webSocket && webSocket.readyState === WebSocket.OPEN) {
   updatePopup(true); // Already connected
 } else {
   updatePopup(false); // Not connected yet

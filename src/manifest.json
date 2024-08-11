@@ -5,7 +5,7 @@
   "description": "Web3Pro",
   "homepage_url": "https://github.com/AlexNa-Holdings/web3pro-extension",
   "background": {
-    "service_worker": "index.js",
+    "service_worker": "bg.js",
     "type": "module"
   },
   "action": {
@@ -27,10 +27,20 @@
         "https://*/*"
       ],
       "js": [
-        "web3pro.js"
+        "content.js"
       ],
       "run_at": "document_start",
       "all_frames": true
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "inject.js"
+      ], 
+      "matches": [
+        "<all_urls>"
+      ]
     }
   ],
   "permissions": [

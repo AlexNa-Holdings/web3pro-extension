@@ -5,7 +5,7 @@ const CopyWebpackPlugin = require("copy-webpack-plugin");
 module.exports = [
   {
     mode: "production",
-    entry: "./src/web3pro.js",
+    entry: "./src/inject.js",
     optimization: {
       minimizer: [
         new TerserPlugin({
@@ -15,7 +15,7 @@ module.exports = [
     },
     output: {
       path: path.resolve(__dirname, "dist"),
-      filename: "web3pro.js",
+      filename: "inject.js",
     },
     performance: {
       hints: false,
@@ -23,27 +23,13 @@ module.exports = [
   },
   {
     mode: "production",
-    entry: "./src/index.js",
+    entry: "./src/bg.js",
     output: {
       path: path.resolve(__dirname, "dist"),
-      filename: "index.js",
+      filename: "bg.js",
     },
     performance: {
       hints: false,
     },
-  },
-  {
-    mode: "production",
-    plugins: [
-      new CopyWebpackPlugin({
-        patterns: [
-          { from: "src/*.png", to: "[name][ext]" },
-          { from: "src/*.html", to: "[name][ext]" },
-          { from: "src/icons/*.png", to: "[name][ext]" },
-          { from: "src/manifest.json", to: "[name][ext]" },
-          { from: "src/settings.js", to: "[name][ext]" },
-        ],
-      }),
-    ],
-  },
+  }
 ];

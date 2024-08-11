@@ -29,13 +29,11 @@ chrome.storage.sync.get('__web3proAppearAsMM__', function(result) {
   } catch (e) {
     mmAppear = false
   }
-  
-  if (mmAppear) {
 
-    console.log('appear as MM')
-  
+  console.log('appear as MM:', mmAppear)
+
+  if (mmAppear) {
     class MetaMaskProvider extends EthereumProvider { }
-  
     try {
       window.ethereum = new MetaMaskProvider(new Connection())
       window.ethereum.isMetaMask = true
@@ -43,20 +41,22 @@ chrome.storage.sync.get('__web3proAppearAsMM__', function(result) {
         isUnlocked: () => true
       }
       window.ethereum.setMaxListeners(0)
+      console.log('appear as MM')
     } catch (e) {
       console.error('Web3Pro Error:', e)
     }
   } else {
-    console.log('appear as Web3Pro')
     class Web3ProProvider extends EthereumProvider { }
-  
     try {
       window.ethereum = new Web3ProProvider(new Connection())
       window.ethereum.isWeb3Pro = true
       window.ethereum.setMaxListeners(0)
+      console.log('appear as Web3Pro')
     } catch (e) {
       console.error('Web3Pro Error:', e)
     }
   }
+
+  console.log('window.ethereum', window.ethereum)
   
 });
