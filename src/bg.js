@@ -24,7 +24,7 @@ function connectWebSocket() {
     console.log("WebSocket disconnected. Attempting to reconnect...");
     // Attempt to reconnect after a delay
     reconnectIntervalId = setTimeout(connectWebSocket, 5000);
-    updatePopup(fasle);
+    updatePopup(false);
   };
 
   webSocket.onerror = (error) => {
@@ -41,6 +41,8 @@ function connectWebSocket() {
       console.error("Failed to parse WebSocket message:", event.data, e);
       return;
     }
+
+    console.log("Received payload:", payload);
 
     if (typeof payload.id !== "undefined") {
       // Handle response to a previous request

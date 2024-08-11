@@ -23,9 +23,7 @@ window.addEventListener("message", (event) => {
   if (!event || !event.data || !event.data.type) return;
   if (event.source !== window) return;
   if (event.data.type === "web3pro:mm") {
-    console.log("appear as MM:", event.data.payload);
     mmAppear = JSON.stringify(event.data.payload);
-    console.log("appear as MM:", mmAppear);
 
     if (mmAppear) {
       class MetaMaskProvider extends EthereumProvider {}
@@ -36,7 +34,6 @@ window.addEventListener("message", (event) => {
           isUnlocked: () => true,
         };
         window.ethereum.setMaxListeners(0);
-        console.log("appear as MM");
       } catch (e) {
         console.error("Web3Pro Error:", e);
       }

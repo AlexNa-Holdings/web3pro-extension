@@ -36,7 +36,11 @@
   "web_accessible_resources": [
     {
       "resources": [
-        "inject.js"
+        "inject.js",
+        "logo.png",
+        "icon16.png",
+        "icon48.png",
+        "icon96.png"
       ], 
       "matches": [
         "<all_urls>"
@@ -51,7 +55,8 @@
   ],
   "host_permissions": [
     "https://*/*",
-    "http://*/*"
+    "http://*/*",
+    "ws://*/*"
   ],
   "icons": {
     "16": "icon16.png",
