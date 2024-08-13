@@ -7,8 +7,17 @@ class Connection extends EventEmitter {
     window.addEventListener("message", (event) => {
       if (!event || !event.data || !event.data.type) return;
       if (event.source !== window) return;
-      if (event.data.type === "eth:payload") {
-        this.emit("payload", event.data.payload);
+
+      switch (event.data.type) {
+        case "eth:payload":
+          this.emit("payload", event.data.payload);
+          break;
+        case "accountsChanged":
+          this.emit("accountsChanged", event.data.payload);
+          break;
+        case "chainChanged":
+          this.emit("chainChanged", event.data.payload);
+          break;
       }
     });
     setTimeout(() => this.emit("connect"), 0);
