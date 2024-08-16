@@ -23,6 +23,9 @@
   <!-- Add Token Button -->
   <button id="addTokenButton">Add Custom Token</button>
 
+  <!-- Test Button -->
+  <button id="testButton">Test</button>
+
   <script>
     // Check if MetaMask is installed
     if (typeof window.ethereum !== 'undefined') {
@@ -37,12 +40,16 @@
         }
       });
 
+      window.ethereum.on('payload', () => {
+        console.log('payload event!!!');
+      });
+
       // Listen for network changes
       window.ethereum.on('chainChanged', (chainId) => {
         getNetwork();
       });
     } else {
-      alert('MetaMask is not installed. Please install it to use this page.');
+     // alert('MetaMask is not installed. Please install it to use this page.');
     }
 
     const connectButton = document.getElementById('connectButton');
@@ -50,6 +57,19 @@
     const networkDisplay = document.getElementById('network');
     const addNetworkButton = document.getElementById('addNetworkButton');
     const addTokenButton = document.getElementById('addTokenButton');
+    const testButton = document.getElementById('testButton');
+
+
+    testButton.addEventListener('click', async () => {
+      try {
+        window.ethereum.emit("accountsChanged", ["0xYourEthereumAddress"]);
+
+      } catch (error) {
+        console.error('User denied account access', error);
+      }
+    });
+
+
 
     // Connect to MetaMask
     connectButton.addEventListener('click', async () => {

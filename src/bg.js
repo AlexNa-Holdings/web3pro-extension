@@ -50,12 +50,23 @@ function connectWebSocket() {
         const { tabId, payloadId } = pending[payload.id];
 
         if (pending[payload.id].method === "eth_subscribe" && payload.result) {
+
+          console.log("Received subscription ID:", payload.result);
+
           // Store the subscription in the subs object
           subs[payload.result] = {
             tabId,
-            send: (subload) => chrome.tabs.sendMessage(tabId, subload),
+            send: (subload) => {chrome.tabs.sendMessage(tabId, subload)
+              console.log("Sending subscription payload:", subload);
+            },
           };
+
+          console.log("Subs ->", subs);
+
         } else if (pending[payload.id].method === "eth_unsubscribe") {
+
+          console.log("Received unsubscription response:", payload);
+
           // Handle unsubscription
           const params = payload.params ? [].concat(payload.params) : [];
           params.forEach((sub) => delete subs[sub]);
@@ -70,10 +81,19 @@ function connectWebSocket() {
         // Clean up the pending request
         delete pending[payload.id];
       }
-    } else if (payload.method && payload.method.indexOf("_subscription") > -1) {
+    } else if (payload.method && payload.subscription) {
+
+      console.log("Received subscription payload:", payload);
+
       // Handle subscription notifications
-      const subscriptionId = payload.params.subscription;
+      const subscriptionId = payload.subscription;
+
+      console.log("Subscription ID ->", subscriptionId);
+      console.log("Subs ->", subs);
+
       if (subs[subscriptionId]) {
+
+        console.log("Found sub ->", payload);
         subs[subscriptionId].send(payload);
       }
     }

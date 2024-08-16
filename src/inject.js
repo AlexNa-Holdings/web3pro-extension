@@ -1,26 +1,33 @@
-const EventEmitter = require("events");
-const EthereumProvider = require("ethereum-provider");
+import EventEmitter from "events";
+import Provider from "ethereum-provider";
+
+class Web3ProProvider extends Provider {
+  resumeSubscriptions() {
+    Object.keys(this.eventHandlers).forEach((event) => {
+      if (!this.listenerCount(event) && !this.attemptedSubscription(event)) //fixed bug in ethereum-provider
+        this.startSubscription(event);
+    });
+  }
+}
 
 class Connection extends EventEmitter {
   constructor() {
     super();
     window.addEventListener("message", (event) => {
-      if (!event || !event.data || !event.data.type) return;
-      if (event.source !== window) return;
+      if (
+        event &&
+        event.source === window &&
+        event.data &&
+        event.data.type === "eth:payload"
+      ) {
+        console.log("emit: event.data.payload", event.data.payload);
 
-      switch (event.data.type) {
-        case "eth:payload":
-          this.emit("payload", event.data.payload);
-          break;
-        case "accountsChanged":
-          this.emit("accountsChanged", event.data.payload);
-          break;
-        case "chainChanged":
-          this.emit("chainChanged", event.data.payload);
-          break;
+        this.emit("payload", event.data.payload);
       }
     });
-    setTimeout(() => this.emit("connect"), 0);
+    setTimeout(() => {
+      this.emit("connect");
+    }, 0);
   }
 
   send(payload) {
@@ -28,37 +35,22 @@ class Connection extends EventEmitter {
   }
 }
 
+try {
+  window.ethereum = new Web3ProProvider(new Connection());
+  window.ethereum.isWeb3Pro = true;
+  window.ethereum._metamask = {
+    isUnlocked: () => true,
+  };
+} catch (e) {
+  console.error("Web3Pro Init Provider Error:", e);
+}
+
 window.addEventListener("message", (event) => {
   if (!event || !event.data || !event.data.type) return;
   if (event.source !== window) return;
   if (event.data.type === "web3pro:mm") {
-    mmAppear = JSON.stringify(event.data.payload);
-
-    if (mmAppear) {
-      class MetaMaskProvider extends EthereumProvider {}
-      try {
-        window.ethereum = new MetaMaskProvider(new Connection());
-        window.ethereum.isMetaMask = true;
-        window.ethereum._metamask = {
-          isUnlocked: () => true,
-        };
-        window.ethereum.setMaxListeners(0);
-      } catch (e) {
-        console.error("Web3Pro Error:", e);
-      }
-    } else {
-      class Web3ProProvider extends EthereumProvider {}
-      try {
-        window.ethereum = new Web3ProProvider(new Connection());
-        window.ethereum.isWeb3Pro = true;
-        window.ethereum.setMaxListeners(0);
-        console.log("appear as Web3Pro");
-      } catch (e) {
-        console.error("Web3Pro Error:", e);
-      }
-    }
-
-    console.log("window.ethereum", window.ethereum);
+    // mmAppear = JSON.stringify(event.data.payload);
+    // window.ethereum.isMetaMask = mmAppear;
   }
 });
 

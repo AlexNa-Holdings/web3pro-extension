@@ -20,7 +20,7 @@
     "webpack-cli": "^5.1.4"
   },
   "dependencies": {
-    "ethereum-provider": "0.4.4",
+    "ethereum-provider": "0.7.7",
     "events": "^3.3.0"
   }
 }
