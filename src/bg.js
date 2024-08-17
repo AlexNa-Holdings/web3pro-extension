@@ -81,12 +81,17 @@ function connectWebSocket() {
         // Clean up the pending request
         delete pending[payload.id];
       }
-    } else if (payload.method && payload.subscription) {
+    } else if (payload.method && payload.method.indexOf('_subscription') > -1) {
 
       console.log("Received subscription payload:", payload);
 
+      if ( !payload.params || !payload.params.subscription ) {
+        console.error("Missing subscription ID in payload:", payload);
+        return;
+      }
+
       // Handle subscription notifications
-      const subscriptionId = payload.subscription;
+      const subscriptionId = payload.params.subscription;
 
       console.log("Subscription ID ->", subscriptionId);
       console.log("Subs ->", subs);

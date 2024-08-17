@@ -23,14 +23,24 @@
   <!-- Add Token Button -->
   <button id="addTokenButton">Add Custom Token</button>
 
-  <!-- Test Button -->
-  <button id="testButton">Test</button>
-
   <script>
     // Check if MetaMask is installed
     if (typeof window.ethereum !== 'undefined') {
       console.log('MetaMask is installed!');
       
+    } else {
+     // alert('MetaMask is not installed. Please install it to use this page.');
+    }
+
+    const connectButton = document.getElementById('connectButton');
+    const addressDisplay = document.getElementById('address');
+    const networkDisplay = document.getElementById('network');
+    const addNetworkButton = document.getElementById('addNetworkButton');
+    const addTokenButton = document.getElementById('addTokenButton');
+ 
+    // Connect to MetaMask
+    connectButton.addEventListener('click', async () => {
+      try {
       // Listen for account changes
       window.ethereum.on('accountsChanged', (accounts) => {
         if (accounts.length > 0) {
@@ -48,32 +58,8 @@
       window.ethereum.on('chainChanged', (chainId) => {
         getNetwork();
       });
-    } else {
-     // alert('MetaMask is not installed. Please install it to use this page.');
-    }
-
-    const connectButton = document.getElementById('connectButton');
-    const addressDisplay = document.getElementById('address');
-    const networkDisplay = document.getElementById('network');
-    const addNetworkButton = document.getElementById('addNetworkButton');
-    const addTokenButton = document.getElementById('addTokenButton');
-    const testButton = document.getElementById('testButton');
 
 
-    testButton.addEventListener('click', async () => {
-      try {
-        window.ethereum.emit("accountsChanged", ["0xYourEthereumAddress"]);
-
-      } catch (error) {
-        console.error('User denied account access', error);
-      }
-    });
-
-
-
-    // Connect to MetaMask
-    connectButton.addEventListener('click', async () => {
-      try {
         const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
         const account = accounts[0];
         addressDisplay.innerText = `Address: ${account}`;

@@ -1,13 +1,15 @@
 import EventEmitter from "events";
 import Provider from "ethereum-provider";
 
+console.log("Web3Pro Injected");
+
 class Web3ProProvider extends Provider {
-  resumeSubscriptions() {
-    Object.keys(this.eventHandlers).forEach((event) => {
-      if (!this.listenerCount(event) && !this.attemptedSubscription(event)) //fixed bug in ethereum-provider
-        this.startSubscription(event);
-    });
-  }
+  // resumeSubscriptions() {
+  //   Object.keys(this.eventHandlers).forEach((event) => {
+  //     if (!this.listenerCount(event) && !this.attemptedSubscription(event)) //fixed bug in ethereum-provider
+  //       this.startSubscription(event);
+  //   });
+  // }
 }
 
 class Connection extends EventEmitter {
@@ -49,8 +51,9 @@ window.addEventListener("message", (event) => {
   if (!event || !event.data || !event.data.type) return;
   if (event.source !== window) return;
   if (event.data.type === "web3pro:mm") {
-    // mmAppear = JSON.stringify(event.data.payload);
-    // window.ethereum.isMetaMask = mmAppear;
+    var mmAppear
+    mmAppear = JSON.stringify(event.data.payload);
+    window.ethereum.isMetaMask = mmAppear;
   }
 });
 
