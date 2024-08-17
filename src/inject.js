@@ -3,33 +3,32 @@ import Provider from "ethereum-provider";
 
 console.log("Web3Pro Injected");
 
-class Web3ProProvider extends Provider {
-  // resumeSubscriptions() {
-  //   Object.keys(this.eventHandlers).forEach((event) => {
-  //     if (!this.listenerCount(event) && !this.attemptedSubscription(event)) //fixed bug in ethereum-provider
-  //       this.startSubscription(event);
-  //   });
-  // }
-}
+class Web3ProProvider extends Provider {}
 
 class Connection extends EventEmitter {
   constructor() {
     super();
     window.addEventListener("message", (event) => {
-      if (
-        event &&
-        event.source === window &&
-        event.data &&
-        event.data.type === "eth:payload"
-      ) {
-        console.log("emit: event.data.payload", event.data.payload);
+      console.log("inject from window: ", event.data);
 
-        this.emit("payload", event.data.payload);
+      if (event && event.source === window && event.data) {
+        switch (event.data.type) {
+          case "web3pro:connected":
+            this.emit("connect");
+            break;
+          case "web3pro:disconnected":
+            this.emit("disconnect");
+            break;
+          case "web3pro:mm":
+            var mmAppear;
+            mmAppear = JSON.stringify(event.data.payload);
+            window.ethereum.isMetaMask = mmAppear;
+          case "eth:payload":
+            this.emit("payload", event.data.payload);
+            break;
+        }
       }
     });
-    setTimeout(() => {
-      this.emit("connect");
-    }, 0);
   }
 
   send(payload) {
@@ -47,14 +46,5 @@ try {
   console.error("Web3Pro Init Provider Error:", e);
 }
 
-window.addEventListener("message", (event) => {
-  if (!event || !event.data || !event.data.type) return;
-  if (event.source !== window) return;
-  if (event.data.type === "web3pro:mm") {
-    var mmAppear
-    mmAppear = JSON.stringify(event.data.payload);
-    window.ethereum.isMetaMask = mmAppear;
-  }
-});
-
 window.postMessage({ type: "web3pro:get-mm" }, window.location.origin);
+window.postMessage({ type: "web3pro:request-status" }, window.location.origin);

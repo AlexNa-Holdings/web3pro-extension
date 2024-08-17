@@ -1,23 +1,19 @@
 // relay messages from the extension to the page and vice versa
-chrome.runtime.onMessage.addListener((payload, sender, sendResponse) => {
-  console.log("content: payload", payload);
+chrome.runtime.onMessage.addListener((data, sender, sendResponse) => {
+  console.log("content: got from bg", data);
 
   window.postMessage(
-    { type: "eth:payload", payload: payload },
+    { type: data.type, payload: data },
     window.location.origin
   );
 });
 
 window.addEventListener("message", (event) => {
+  console.log("content got from tab", event.data);
+
   if (event.source !== window) return;
   if (!event.data) return;
-  if (event.data.type === "eth:send") {
-    chrome.runtime.sendMessage(event.data.payload); // Relay the message to the extension
-  }
   if (event.data.type === "web3pro:get-mm") {
-
-    console.log("web3pro:get-mm");
-
     chrome.storage.sync.get("__web3proAppearAsMM__", function (result) {
       let mmAppear = result["__web3proAppearAsMM__"];
       try {
@@ -31,6 +27,7 @@ window.addEventListener("message", (event) => {
       );
     });
   }
+  chrome.runtime.sendMessage(event.data); // Relay the message to the extension 
 });
 
 // // Inject the script into the page

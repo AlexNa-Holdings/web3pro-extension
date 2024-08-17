@@ -18,6 +18,11 @@ function connectWebSocket() {
       reconnectIntervalId = null;
     }
     updatePopup(true);
+
+    // broadcast to all the subscribed tabs
+    Object.keys(subs).forEach((sub) => {
+      chrome.tabs.sendMessage(sub.tabId, { method: "web3pro:connected" });
+    });
   };
 
   webSocket.onclose = (event) => {
@@ -25,6 +30,10 @@ function connectWebSocket() {
     // Attempt to reconnect after a delay
     reconnectIntervalId = setTimeout(connectWebSocket, 5000);
     updatePopup(false);
+    // broadcast to all the subscribed tabs
+    Object.keys(subs).forEach((sub) => {
+      chrome.tabs.sendMessage(sub.tabId, { method: "web3pro:disconnected" });
+    });
   };
 
   webSocket.onerror = (error) => {
@@ -35,7 +44,6 @@ function connectWebSocket() {
     let payload;
 
     try {
-      // Parse the incoming message as JSON
       payload = JSON.parse(event.data);
     } catch (e) {
       console.error("Failed to parse WebSocket message:", event.data, e);
@@ -50,21 +58,21 @@ function connectWebSocket() {
         const { tabId, payloadId } = pending[payload.id];
 
         if (pending[payload.id].method === "eth_subscribe" && payload.result) {
-
           console.log("Received subscription ID:", payload.result);
 
           // Store the subscription in the subs object
           subs[payload.result] = {
             tabId,
-            send: (subload) => {chrome.tabs.sendMessage(tabId, subload)
-              console.log("Sending subscription payload:", subload);
+            send: (subload) => {
+              chrome.tabs.sendMessage(
+                tabId,
+                Object.assign({}, subload, { type: "eth:payload" })
+              );
             },
           };
 
           console.log("Subs ->", subs);
-
         } else if (pending[payload.id].method === "eth_unsubscribe") {
-
           console.log("Received unsubscription response:", payload);
 
           // Handle unsubscription
@@ -75,30 +83,22 @@ function connectWebSocket() {
         // Send the response back to the appropriate tab
         chrome.tabs.sendMessage(
           tabId,
-          Object.assign({}, payload, { id: payloadId })
+          Object.assign({}, payload, { type: "eth:payload", id: payloadId })
         );
 
         // Clean up the pending request
         delete pending[payload.id];
       }
-    } else if (payload.method && payload.method.indexOf('_subscription') > -1) {
-
+    } else if (payload.method && payload.method.indexOf("_subscription") > -1) {
       console.log("Received subscription payload:", payload);
 
-      if ( !payload.params || !payload.params.subscription ) {
+      if (!payload.params || !payload.params.subscription) {
         console.error("Missing subscription ID in payload:", payload);
         return;
       }
-
       // Handle subscription notifications
       const subscriptionId = payload.params.subscription;
-
-      console.log("Subscription ID ->", subscriptionId);
-      console.log("Subs ->", subs);
-
       if (subs[subscriptionId]) {
-
-        console.log("Found sub ->", payload);
         subs[subscriptionId].send(payload);
       }
     }
@@ -123,23 +123,31 @@ if (webSocket && webSocket.readyState === WebSocket.OPEN) {
   updatePopup(false); // Not connected yet
 }
 
-chrome.runtime.onMessage.addListener((payload, sender, sendResponse) => {
-  const id = nextId++;
-  pending[id] = {
-    tabId: sender.tab.id,
-    payloadId: payload.id,
-    method: payload.method,
-  };
-  const load = Object.assign({}, payload, {
-    id,
-    __web3proOrigin: getOrigin(sender.url),
-  });
-  webSocket.send(JSON.stringify(load));
+chrome.runtime.onMessage.addListener((data, sender, sendResponse) => {
+  console.log("bg got from tab:", data);
+
+  if (data.type === "web3pro:request-status") {
+    if (webSocket && webSocket.readyState === WebSocket.OPEN) {
+      chrome.tabs.sendMessage(sender.tab.id, { type: "web3pro:connected" });
+    } else {
+      chrome.tabs.sendMessage(sender.tab.id, { type: "web3pro:disconnected" });
+    }
+  } else if (data.type === "eth:send") {
+    const id = nextId++;
+    pending[id] = {
+      tabId: sender.tab.id,
+      payloadId: data.payload.id,
+      method: data.payload.method,
+    };
+    const load = Object.assign({}, data.payload, {
+      id,
+      __web3proOrigin: getOrigin(sender.url),
+    });
+    webSocket.send(JSON.stringify(load));
+  }
 });
 
 const unsubscribeTab = (tabId) => {
-  console.log("Unsubscribe tab:", tabId);
-
   Object.keys(pending).forEach((id) => {
     if (pending[id].tabId === tabId) delete pending[id];
   });

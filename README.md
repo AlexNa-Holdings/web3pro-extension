@@ -1,4 +1,5 @@
-Based on the Frame extension: https://github.com/floating/frame-extension
+Based on the Frame extension: https://github.com/floating/frame-extension, 
+but heavily modified and improved for the Web3Pro wallet
 
 ### Build
 ```bash
@@ -12,7 +13,7 @@ Based on the Frame extension: https://github.com/floating/frame-extension
 › npm run build
 ```
 
-### Install
+### Install (developer mode)
 
 1. Go to `brave://extensions` or `chrome://extensions`
 2. Turn developer mode on if not already active (top-right corner)
