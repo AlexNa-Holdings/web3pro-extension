@@ -25,6 +25,7 @@ class Connection extends EventEmitter {
             window.ethereum.isMetaMask = mmAppear;
           case "eth:payload":
             this.emit("payload", event.data.payload);
+//            this.emit("payload", typeof event.data.payload === 'string' ? event.data.payload : JSON.stringify(event.data.payload));
             break;
         }
       }

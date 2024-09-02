@@ -23,13 +23,15 @@
   <!-- Add Token Button -->
   <button id="addTokenButton">Add Custom Token</button>
 
+  <!-- Test Signing Permission Button -->
+  <button id="testSignButton">Test Signing Permission</button>
+
   <script>
     // Check if MetaMask is installed
     if (typeof window.ethereum !== 'undefined') {
       console.log('MetaMask is installed!');
-      
     } else {
-     // alert('MetaMask is not installed. Please install it to use this page.');
+      alert('MetaMask is not installed. Please install it to use this page.');
     }
 
     const connectButton = document.getElementById('connectButton');
@@ -37,28 +39,24 @@
     const networkDisplay = document.getElementById('network');
     const addNetworkButton = document.getElementById('addNetworkButton');
     const addTokenButton = document.getElementById('addTokenButton');
- 
+    const testSignButton = document.getElementById('testSignButton');
+
     // Connect to MetaMask
     connectButton.addEventListener('click', async () => {
       try {
-      // Listen for account changes
-      window.ethereum.on('accountsChanged', (accounts) => {
-        if (accounts.length > 0) {
-          addressDisplay.innerText = `Address: ${accounts[0]}`;
-        } else {
-          addressDisplay.innerText = 'Address: Not connected';
-        }
-      });
+        // Listen for account changes
+        window.ethereum.on('accountsChanged', (accounts) => {
+          if (accounts.length > 0) {
+            addressDisplay.innerText = `Address: ${accounts[0]}`;
+          } else {
+            addressDisplay.innerText = 'Address: Not connected';
+          }
+        });
 
-      window.ethereum.on('payload', () => {
-        console.log('payload event!!!');
-      });
-
-      // Listen for network changes
-      window.ethereum.on('chainChanged', (chainId) => {
-        getNetwork();
-      });
-
+        // Listen for network changes
+        window.ethereum.on('chainChanged', (chainId) => {
+          getNetwork();
+        });
 
         const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
         const account = accounts[0];
@@ -147,6 +145,66 @@
         console.error('Failed to add token', error);
       }
     });
+
+    // Test Signing Permission
+    testSignButton.addEventListener('click', async () => {
+      try {
+        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+        const account = accounts[0];
+
+        const domain = {
+          name: "SAVVA",
+          version: "1",
+          chainId: await window.ethereum.request({ method: 'eth_chainId' }),
+          verifyingContract: "0x99eadb13da88952c18f980bd6b910adba770130e"
+        };
+
+        const message = {
+          owner: account,
+          spender: "0xdb05499bf37f623bf7eec665c7ef1d226be68bcc",
+          value: "1000000000000000000", // 1 ETH in wei
+          nonce: "3",
+          deadline: "1724892277174" // A future timestamp in milliseconds
+        };
+
+        const data = JSON.stringify({
+          types: {
+            EIP712Domain: [
+              { name: "name", type: "string" },
+              { name: "version", type: "string" },
+              { name: "chainId", type: "uint256" },
+              { name: "verifyingContract", type: "address" }
+            ],
+            Permit: [
+              { name: "owner", type: "address" },
+              { name: "spender", type: "address" },
+              { name: "value", type: "uint256" },
+              { name: "nonce", type: "uint256" },
+              { name: "deadline", type: "uint256" }
+            ]
+          },
+          primaryType: "Permit",
+          domain: domain,
+          message: message
+        });
+
+        const signature = await window.ethereum.request({
+          method: 'eth_signTypedData_v4',
+          params: [account, data],
+        });
+
+        console.log('Signature:', signature);
+        alert('Signature received:\n' + signature);
+      } catch (error) {
+        console.error('Failed to sign message', error);
+      }
+    });
+
+    function toHex(string) {
+      return Array.from(string).map(c =>
+        c.charCodeAt(0).toString(16).padStart(2, '0')
+      ).join('');
+    }
   </script>
 </body>
 </html>

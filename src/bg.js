@@ -6,6 +6,7 @@ const updatePopup = (isConnected) => {
 let webSocket = null;
 let reconnectIntervalId;
 
+
 function connectWebSocket() {
   webSocket = new WebSocket(
     "ws://127.0.0.1:9323/ws?identity=web3pro-extension"
@@ -21,7 +22,7 @@ function connectWebSocket() {
 
     // broadcast to all the subscribed tabs
     Object.keys(subs).forEach((sub) => {
-      chrome.tabs.sendMessage(sub.tabId, { method: "web3pro:connected" });
+      chrome.tabs.sendMessage(subs[sub].tabId, { method: "web3pro:connected" });
     });
   };
 
@@ -32,7 +33,7 @@ function connectWebSocket() {
     updatePopup(false);
     // broadcast to all the subscribed tabs
     Object.keys(subs).forEach((sub) => {
-      chrome.tabs.sendMessage(sub.tabId, { method: "web3pro:disconnected" });
+      chrome.tabs.sendMessage(subs[sub].tabId, { method: "web3pro:disconnected" });
     });
   };
 
