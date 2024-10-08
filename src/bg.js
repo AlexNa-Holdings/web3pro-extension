@@ -6,6 +6,9 @@ const updatePopup = (isConnected) => {
 let webSocket = null;
 let reconnectIntervalId;
 
+var subs = {};
+var pending = {};
+var nextId = 1;
 
 function connectWebSocket() {
   webSocket = new WebSocket(
@@ -35,6 +38,7 @@ function connectWebSocket() {
     Object.keys(subs).forEach((sub) => {
       chrome.tabs.sendMessage(subs[sub].tabId, { method: "web3pro:disconnected" });
     });
+    subs = {};
   };
 
   webSocket.onerror = (error) => {
@@ -64,6 +68,7 @@ function connectWebSocket() {
           // Store the subscription in the subs object
           subs[payload.result] = {
             tabId,
+            origin: pending[payload.id].origin,
             send: (subload) => {
               chrome.tabs.sendMessage(
                 tabId,
@@ -108,10 +113,6 @@ function connectWebSocket() {
 
 connectWebSocket();
 
-const subs = {};
-const pending = {};
-var nextId = 1;
-
 const getOrigin = (url) => {
   const path = url.split("/");
   return path[0] + "//" + path[2];
@@ -139,10 +140,11 @@ chrome.runtime.onMessage.addListener((data, sender, sendResponse) => {
       tabId: sender.tab.id,
       payloadId: data.payload.id,
       method: data.payload.method,
+      origin: getOrigin(sender.url),
     };
     const load = Object.assign({}, data.payload, {
       id,
-      __web3proOrigin: getOrigin(sender.url),
+      __web3proOrigin: pending[id].origin,
     });
     webSocket.send(JSON.stringify(load));
   }
@@ -154,11 +156,13 @@ const unsubscribeTab = (tabId) => {
   });
   Object.keys(subs).forEach((sub) => {
     if (subs[sub].tabId === tabId) {
+      const id = nextId++;
       const message = {
         jsonrpc: "2.0",
-        id: 1,
+        id: id,
         method: "eth_unsubscribe",
         params: [sub],
+        __web3proOrigin: subs[sub].origin,
       };
       webSocket.send(JSON.stringify(message));
       delete subs[sub];

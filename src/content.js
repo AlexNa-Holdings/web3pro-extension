@@ -30,8 +30,3 @@ window.addEventListener("message", (event) => {
   chrome.runtime.sendMessage(event.data); // Relay the message to the extension 
 });
 
-// // Inject the script into the page
-// const scriptElement = document.createElement("script");
-// scriptElement.src = chrome.runtime.getURL("inject.js"); // Points to your inject.js file in the extension's directory
-// scriptElement.onload = () => scriptElement.remove(); // Remove the script tag after it has been executed
-// (document.head || document.documentElement).appendChild(scriptElement);
