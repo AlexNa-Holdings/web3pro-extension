@@ -36,7 +36,9 @@ function connectWebSocket() {
     updatePopup(false);
     // broadcast to all the subscribed tabs
     Object.keys(subs).forEach((sub) => {
-      chrome.tabs.sendMessage(subs[sub].tabId, { method: "web3pro:disconnected" });
+      chrome.tabs.sendMessage(subs[sub].tabId, {
+        method: "web3pro:disconnected",
+      });
     });
     subs = {};
   };
@@ -115,6 +117,9 @@ connectWebSocket();
 
 const getOrigin = (url) => {
   const path = url.split("/");
+  if (path.length < 3) {
+    return url;
+  }
   return path[0] + "//" + path[2];
 };
 
@@ -135,18 +140,36 @@ chrome.runtime.onMessage.addListener((data, sender, sendResponse) => {
       chrome.tabs.sendMessage(sender.tab.id, { type: "web3pro:disconnected" });
     }
   } else if (data.type === "eth:send") {
-    const id = nextId++;
-    pending[id] = {
-      tabId: sender.tab.id,
-      payloadId: data.payload.id,
-      method: data.payload.method,
-      origin: getOrigin(sender.url),
-    };
-    const load = Object.assign({}, data.payload, {
-      id,
-      __web3proOrigin: pending[id].origin,
-    });
-    webSocket.send(JSON.stringify(load));
+    // determine the tab origin
+    if (sender.tab && sender.tab.id) {
+      chrome.tabs.get(sender.tab.id, (tab) => {
+        if (chrome.runtime.lastError) {
+          console.error(
+            "Error getting tab information:",
+            chrome.runtime.lastError
+          );
+          return;
+        }
+
+        const o = getOrigin(tab.url);
+        const id = nextId++;
+        pending[id] = {
+          tabId: sender.tab.id,
+          payloadId: data.payload.id,
+          method: data.payload.method,
+          origin: o,
+        };
+        const load = Object.assign({}, data.payload, {
+          id,
+          __web3proOrigin: o,
+        });
+        webSocket.send(JSON.stringify(load));
+      });
+    } else {
+      console.warn(
+        "No tab associated with the sender or tab ID is not available."
+      );
+    }
   }
 });
 
