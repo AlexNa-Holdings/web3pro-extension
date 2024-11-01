@@ -1,5 +1,25 @@
-Based on the Frame extension: https://github.com/floating/frame-extension, 
+# Web3Pro Cypto Wallet Extension
+
+This is a crypto wallet that I use for my personal use. It is a selfware project. It is not intended for mass consumption
+
+It is based on the Frame extension: https://github.com/floating/frame-extension, 
 but heavily modified and improved for the Web3Pro wallet
+
+
+# SELFWARE
+
+- **SelfWare**: Software made for myself, shared openly.
+
+- **Not a Product**: Never intended for mass consumption or to meet market needs.
+
+- **Developer-Driven**: Built exactly the way the developer envisions—no compromises, no community influence.
+
+- **Open Source**: Open for anyone to use, modify, or adapt as they see fit, while staying true to the developer's original vision.
+
+- **Independence**: No roadmaps driven by user feedback, no polls, no votes—only the developer's decisions.
+
+- **A Personal Tool**: Solves specific problems for the creator, rather than catering to a broad user base.
+
 
 ### Build
 ```bash
